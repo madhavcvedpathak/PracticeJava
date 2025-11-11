@@ -1,0 +1,192 @@
+//Given an integer array arr[], return the count of all the distinct elements in an array.
+import java.util.*;
+class Solution {
+    static int distinct(int arr[]) {
+        Set<Integer> set = new HashSet<>();
+        for (int x : arr) set.add(x);   // add each element
+        return set.size();              // distinct count
+    }
+}
+
+//Two Sum - Pair with Given Sum
+class Solution {
+     boolean twoSum(int arr[], int target) {
+        Set<Integer> seen = new HashSet<>();
+
+        for (int x : arr) {
+            int needed = target - x;
+            if (seen.contains(needed)) {
+                return true;   // found a pair
+            }
+            seen.add(x);
+        }
+
+        return false; // no pair found
+    }
+}
+
+//Missing Element in Range
+class Solution {
+    public ArrayList<Integer> missingRange(int[] arr, int low, int high) {
+        Set<Integer> present = new HashSet<>();
+        for (int x : arr) {
+            if (x >= low && x <= high) { // store only numbers in the range
+                present.add(x);
+            }
+        }
+
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int num = low; num <= high; num++) {
+            if (!present.contains(num)) {
+                result.add(num);
+            }
+        }
+        return result;
+    }
+}
+
+
+//Most Frequent Character
+class Solution {
+    public char getMaxOccuringChar(String s) {
+        Map<Character, Integer> map = new HashMap<>();
+
+        // Count frequency
+        for (char c : s.toCharArray()) {
+            map.put(c, map.getOrDefault(c, 0) + 1);
+        }
+
+        // Find max frequency character
+        char ans = 'z';
+        int maxFreq = 0;
+
+        for (char c : map.keySet()) {
+            int freq = map.get(c);
+            if (freq > maxFreq || (freq == maxFreq && c < ans)) {
+                maxFreq = freq;
+                ans = c;
+            }
+        }
+        return ans;
+    }
+}
+
+//Burning Tree
+class Solution {
+    public static int minTime(Node root, int target) {
+        // Step 1: Build parent mapping & find the target node
+        Map<Node, Node> parentMap = new HashMap<>();  // child -> parent
+        Node targetNode = null;
+
+        Queue<Node> levelOrderQueue = new LinkedList<>();
+        levelOrderQueue.add(root);
+
+        while (!levelOrderQueue.isEmpty()) {
+            Node currentNode = levelOrderQueue.poll();
+
+            if (currentNode.data == target) {
+                targetNode = currentNode; // found the fire starting point
+            }
+
+            if (currentNode.left != null) {
+                parentMap.put(currentNode.left, currentNode);
+                levelOrderQueue.add(currentNode.left);
+            }
+            if (currentNode.right != null) {
+                parentMap.put(currentNode.right, currentNode);
+                levelOrderQueue.add(currentNode.right);
+            }
+        }
+
+        // Step 2: Spread fire using BFS
+        Set<Node> visited = new HashSet<>();  // to avoid revisiting nodes
+        Queue<Node> burningQueue = new LinkedList<>();
+        burningQueue.add(targetNode);
+        visited.add(targetNode);
+
+        int timeToBurn = -1;  // will increase at each level (second)
+
+        while (!burningQueue.isEmpty()) {
+            int nodesAtThisLevel = burningQueue.size();
+            timeToBurn++;
+
+            while (nodesAtThisLevel-- > 0) {
+                Node burningNode = burningQueue.poll();
+
+                // Fire spreads to left child
+                if (burningNode.left != null && visited.add(burningNode.left)) {
+                    burningQueue.add(burningNode.left);
+                }
+                // Fire spreads to right child
+                if (burningNode.right != null && visited.add(burningNode.right)) {
+                    burningQueue.add(burningNode.right);
+                }
+                // Fire spreads to parent
+                if (parentMap.containsKey(burningNode) && visited.add(parentMap.get(burningNode))) {
+                    burningQueue.add(parentMap.get(burningNode));
+                }
+            }
+        }
+        return timeToBurn;
+    }
+}
+
+
+//138. Copy List with Random Pointer
+class Solution {
+    public Node copyRandomList(Node head) {
+        if (head == null) return null;
+
+        // Step 1: Create a mapping from original nodes to their copies
+        Map<Node, Node> nodeMap = new HashMap<>();
+
+        Node curr = head;
+        while (curr != null) {
+            nodeMap.put(curr, new Node(curr.val));
+            curr = curr.next;
+        }
+
+        // Step 2: Assign next and random pointers for the copied nodes
+        curr = head;
+        while (curr != null) {
+            Node copy = nodeMap.get(curr);
+            copy.next = nodeMap.get(curr.next);       // link "next"
+            copy.random = nodeMap.get(curr.random);   // link "random"
+            curr = curr.next;
+        }
+
+        // Step 3: Return copied head
+        return nodeMap.get(head);
+    }
+}
+
+
+//Count pairs in array divisible by K
+class Solution {
+    public static long countKdivPairs(int arr[], int n, int k) {
+        HashMap<Integer, Long> freq = new HashMap<>();
+
+        // Count remainders
+        for (int num : arr) {
+            int r = ((num % k) + k) % k; // handle negatives
+            freq.put(r, freq.getOrDefault(r, 0L) + 1);
+        }
+
+        long pairs = 0;
+
+        for (int r : freq.keySet()) {
+            int complement = (k - r) % k;
+            if (r > complement) continue; // avoid double counting
+
+            long c1 = freq.getOrDefault(r, 0L);
+            long c2 = freq.getOrDefault(complement, 0L);
+
+            if (r == complement || r == 0) {
+                pairs += (c1 * (c1 - 1)) / 2; // same group
+            } else {
+                pairs += c1 * c2; // different groups
+            }
+        }
+        return pairs;
+    }
+}

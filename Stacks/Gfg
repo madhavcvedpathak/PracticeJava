@@ -1,0 +1,364 @@
+//Find the Minimum and Maximum Number of Nodes Between Critical Points
+class Solution {
+
+    public int[] nodesBetweenCriticalPoints(ListNode head) {
+    int index = 1;
+    int first = -1;
+    int last = -1;
+    int prevCritical = -1;
+    int min = Integer.MAX_VALUE;
+
+    ListNode a = head;
+    ListNode b = head.next;
+    ListNode c = b.next;
+
+    while (c != null) {
+        // Check if b is a critical point
+        if ((b.val > a.val && b.val > c.val) || (b.val < a.val && b.val < c.val)) {
+            if (first == -1) {
+                first = index;
+            } else {
+                min = Math.min(min, index - prevCritical);
+                last = index;
+            }
+            prevCritical = index;
+        }
+
+        // Move to next 3 nodes
+        a = b;
+        b = c;
+        c = c.next;
+        index++;
+    }
+
+    // If less than 2 critical points
+    if (first == -1 || last == -1) {
+        return new int[]{-1, -1};
+    }
+    return new int[]{min, last - first};
+    }
+}
+
+
+//Copy List with Random Pointer
+public Node copyRandomList(Node head) {
+    if(head == null) return null;
+    Node curr = head;
+    while(curr != null){
+        Node copy = new Node(curr.val);
+        copy.next = curr.next;
+        curr.next = copy;
+        curr = copy.next;
+    }
+    curr = head;
+    while(curr != null){
+        if(curr.random != null){
+            curr.next.random = curr.random.next;
+        }
+        curr = curr.next.next;
+    }
+    curr = head;
+    Node copiedHead = head.next;
+    Node copyCurr = copiedHead;
+    while(curr!=null){
+        curr.next = curr.next.next;
+        if(copyCurr.next != null){
+            copyCurr.next = copyCurr.next.next;
+        }
+        curr = curr.next;
+        copyCurr = copyCurr.next;
+    }
+    return copiedHead;
+}
+
+//Parenthesis Checker
+static boolean isBalanced(String s) {
+    int n = s.length();
+    if(n%2 == 1) return false;
+    Stack<Character> st = new Stack<>();
+    for(int i=0;i<n;i++){
+        char ch = s.charAt(i);
+        if(ch=='(' || ch=='[' || ch=='{') st.push(ch);
+        else{ // ch closing bracket hua to
+            if(st.size()==0) return false;
+            char top = st.peek();
+            if(sameStyle(top,ch)) st.pop();
+            else return false;
+        }
+    }
+    return (st.size()==0);
+}
+static boolean sameStyle(char a, char b) {
+    if(a=='(' && b==')') return true;
+    if(a=='[' && b==']') return true;
+    if(a=='{' && b=='}') return true;
+    return false;
+}
+
+
+//Baseball Game
+public int calPoints(String[] arr) {
+    int n = arr.length;
+    Stack<Integer> st = new Stack<>();
+    for(int i=0;i<n;i++){
+        String s = arr[i];
+        if(s.equals("C")) st.pop();
+        else if(s.equals("D")) st.push(2*st.peek());
+        else if(s.equals("+")){
+            int top = st.pop();
+            int secondTop = st.peek();
+            int sum = top + secondTop;
+            st.push(top);
+            st.push(sum);
+        }
+        else st.push(Integer.parseInt(s));
+    }
+    int sum = 0;
+    while(st.size()>0){
+        sum += st.pop();
+    }
+    return sum;
+}
+
+
+//Remove Nodes From Linked List
+public ListNode removeNodes(ListNode head) {
+    Stack<ListNode> st = new Stack<>();
+    ListNode temp = head;
+
+    while (temp != null) {
+        while (!st.isEmpty() && st.peek().val < temp.val) {
+            st.pop();
+        }
+        st.push(temp);
+        temp = temp.next;
+    }
+    temp = null;
+    while (!st.isEmpty()) {
+        ListNode top = st.pop();
+        top.next = temp;
+        temp = top;
+    }
+    return temp;
+}
+
+
+//503. Next Greater Element II
+public int[] nextGreaterElements(int[] nums) {
+    int n = nums.length;
+    int[] result = new int[n];
+    Arrays.fill(result, -1);           // Initialize all to -1
+    Stack<Integer> stack = new Stack<>();
+
+    // Loop twice to simulate circular array
+    for (int i = 2 * n - 1; i >= 0; i--) {
+        int index = i % n;
+                        // Pop smaller or equal elements
+        while (!stack.isEmpty() && nums[stack.peek()] <= nums[index]) {
+            stack.pop();
+        }
+                        // If stack has a bigger element, it's the next greater
+        if (!stack.isEmpty()) {
+            result[index] = nums[stack.peek()];
+        }
+                        // Push current index to stack
+        stack.push(index);
+    }
+    return result;
+}
+
+
+//Stock Span Problem
+public ArrayList<Integer> calculateSpan(int[] arr) {
+    int n = arr.length;
+    ArrayList<Integer> span = new ArrayList<>();
+    Stack<Integer> stack = new Stack<>();
+
+    for (int i = 0; i < n; i++) {
+        // Pop all elements smaller or equal to current price
+        while (!stack.isEmpty() && arr[stack.peek()] <= arr[i]) {
+            stack.pop();
+        }
+        if (stack.isEmpty()) {
+            // No greater element to the left
+            span.add(i + 1);
+        } else {
+            // The difference between current day and last higher price
+            span.add(i - stack.peek());
+        }
+        stack.push(i);  // Push current index
+    }
+    return span;
+}
+
+OR
+
+class Solution {
+    int stockBuySell(int arr[]) {
+        // code here
+        int profit = 0;
+
+        for(int i = 1; i < arr.length; i++){
+            if(arr[i] > arr[i - 1]){
+                profit += arr[i] - arr[i- 1];
+            }
+        }
+        return profit;
+    }
+}
+
+
+//The Celebrity Problem
+public int celebrity(int mat[][]) {
+    int n = mat.length;
+    Stack<Integer> stack = new Stack<>();
+
+    for (int i = 0; i < n; i++) {
+        stack.push(i);
+    }
+    // Step 2: Find potential celebrity
+    while (stack.size() > 1) {
+        int a = stack.pop();
+        int b = stack.pop();
+        if (mat[a][b] == 1) {
+            // a knows b → a can't be celebrity
+            stack.push(b);
+        } else {
+            // a doesn't know b → b can't be celebrity
+            stack.push(a);
+        }
+    }
+    // Step 3: Verify candidate
+    if (stack.isEmpty()) return -1; // no candidate
+    int candidate = stack.pop();
+    // Check if candidate is celebrity
+    for (int i = 0; i < n; i++) {
+        if (i != candidate) {
+            if (mat[candidate][i] == 1 || mat[i][candidate] == 0) {
+                return -1; // not a celebrity
+            }
+        }
+    }
+    return candidate;
+}
+
+
+//1944. Number of Visible People in a Queue
+public int[] canSeePersonsCount(int[] heights) {
+    int n = heights.length;
+    int[] answer = new int[n];
+    Stack<Integer> stack = new Stack<>();
+
+    for (int i = n - 1; i >= 0; i--) {
+        int count = 0;
+        // Pop and count all shorter people (they are visible)
+        while (!stack.isEmpty() && heights[i] > stack.peek()) {
+            stack.pop();
+            count++;
+        }
+        // If stack is not empty, there's a taller person we can see
+        if (!stack.isEmpty()) {
+            count++;
+        }
+        answer[i] = count;
+        // Push current height into the stack
+        stack.push(heights[i]);
+    }
+    return answer;
+}
+
+//84. Largest Rectangle in Histogram
+public int largestRectangleArea(int[] heights) {
+    Stack<Integer> stack = new Stack<>();
+    int maxArea = 0;
+    int n = heights.length;
+
+    for(int i = 0; i <= n; i++){
+        int currentHeight = (i == n) ? 0 : heights[i];
+        while(!stack.isEmpty() && currentHeight < heights[stack.peek()]){
+            int topIndex = stack.pop();
+            int height = heights[topIndex];
+            int width;
+            if(stack.isEmpty()){
+                width = i;
+            } else {
+                width = i - stack.peek() - 1;
+            }
+            int area = height * width;
+            maxArea = Math.max(maxArea, area);
+        }
+        stack.push(i);
+    }
+    return maxArea;
+}
+
+//Max rectangle
+static int maxArea(int mat[][]) {
+    int n = mat.length;
+    int m = mat[0].length;
+    int maxArea = 0; // This will store the largest area
+    int[] height = new int[m]; // We'll update this row as a histogram
+
+    for (int i = 0; i < n; i++) { // Go through each row
+        for (int j = 0; j < m; j++) { // Build the histogram for this row
+            if (mat[i][j] == 0) {
+                height[j] = 0;  // Reset to 0
+            } else {
+                height[j] += 1; // Add on top of previous
+            }
+        }
+        int area = largestRectangle(height); // Find max rectangle in this histogram row
+        maxArea = Math.max(maxArea, area);
+    }
+    return maxArea;
+}
+static int largestRectangle(int[] heights) {
+    Stack<Integer> stack = new Stack<>();
+    int maxArea = 0;
+    int n = heights.length;
+    for (int i = 0; i <= n; i++) {
+        int currentHeight = (i == n) ? 0 : heights[i];
+        while (!stack.isEmpty() && currentHeight < heights[stack.peek()]) {
+            int height = heights[stack.pop()];
+            int width = stack.isEmpty() ? i : i - stack.peek() - 1;
+            int area = height * width;
+            maxArea = Math.max(maxArea, area);
+        }
+        stack.push(i);
+    }
+    return maxArea;
+}
+
+
+//155. Min Stack
+class MinStack {
+    private Stack<Integer> mainStack;
+    private Stack<Integer> minStack;
+
+    public MinStack() {
+        mainStack = new Stack<>();
+        minStack = new Stack<>();
+    }
+
+    public void push(int val) {
+        mainStack.push(val);
+        if (minStack.isEmpty()) {
+            minStack.push(val);
+        } else {
+            minStack.push(Math.min(val, minStack.peek()));
+        }
+    }
+
+    public void pop() {
+        mainStack.pop();
+        minStack.pop();
+    }
+
+    public int top() {
+        return mainStack.peek();
+    }
+
+    public int getMin() {
+        return minStack.peek();
+    }
+}

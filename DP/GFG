@@ -1,0 +1,294 @@
+//Recursive + Memoization (Top-Down DP)
+
+class Solution {
+    private int[][] memo;
+
+    public int numberOfPaths(int m, int n) {
+        memo = new int[m][n];
+        return helper(m - 1, n - 1);
+    }
+
+    private int helper(int i, int j) {
+        // base cases
+        if (i == 0 || j == 0) return 1;
+
+        if (memo[i][j] != 0) return memo[i][j];
+
+        memo[i][j] = helper(i - 1, j) + helper(i, j - 1);
+        return memo[i][j];
+    }
+}
+
+//Iterative Tabulation (Bottom-Up DP)
+
+class Solution {
+    public int numberOfPaths(int m, int n) {
+        int[][] dp = new int[m][n];
+
+        // initialize first row & first column
+        for (int i = 0; i < m; i++) dp[i][0] = 1;
+        for (int j = 0; j < n; j++) dp[0][j] = 1;
+
+        // fill the table
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+}
+
+//Nth Fibonacci Number
+class Solution {
+    static int fibMemo(int n, int[] dp) {
+        if (n <= 1) return n;
+        if (dp[n] != -1) return dp[n]; // already computed
+        dp[n] = fibMemo(n - 1, dp) + fibMemo(n - 2, dp);
+        return dp[n];
+    }
+
+    static int nthFibonacci(int n) {
+        int[] dp = new int[n + 1];
+        for (int i = 0; i <= n; i++) dp[i] = -1;
+        return fibMemo(n, dp);
+    }
+}
+
+
+//Min Cost Climbing Stairs
+class Solution {
+    static int minCostClimbingStairs(int[] cost) {
+        int n = cost.length;
+        if (n == 2) return Math.min(cost[0], cost[1]);
+
+        int prev2 = cost[0];
+        int prev1 = cost[1];
+
+        for (int i = 2; i < n; i++) {
+            int curr = cost[i] + Math.min(prev1, prev2);
+            prev2 = prev1;
+            prev1 = curr;
+        }
+
+        return Math.min(prev1, prev2);
+    }
+};
+
+
+//Friends Pairing Problem
+class Solution {
+    private long[] dp;
+    public long countFriendsPairings(int n) {
+        dp = new long[n+1];
+        for (int i = 0; i <= n; i++) dp[i] = -1;  // initialize memo
+        return friendsPairing(n);
+    }
+
+    private long friendsPairing(int n) {
+
+        if (n <= 2) return n;
+
+        if (dp[n] != -1) return dp[n];
+
+        dp[n] = friendsPairing(n-1) + (n-1) * friendsPairing(n-2);
+
+        return dp[n];
+    }
+}
+
+
+//Disarrangement of balls
+class Solution {
+    static int countDer(int n) {
+        if (n == 1) return 0;
+        if (n == 2) return 1;
+
+        int[] dp = new int[n+1];
+        dp[1] = 0;
+        dp[2] = 1;
+
+        for (int i = 3; i <= n; i++) {
+            dp[i] = (i - 1) * (dp[i-1] + dp[i-2]);
+        }
+        return dp[n];
+    }
+}
+
+
+
+//Count Square Submatrices with All Ones
+class Solution {
+    public int countSquares(int N, int M, int mat[][]) {
+        int totalSquares = 0;
+
+        // Traverse matrix
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (mat[i][j] == 1 && i > 0 && j > 0) {
+                    mat[i][j] = 1 + Math.min(mat[i - 1][j],
+                                   Math.min(mat[i][j - 1], mat[i - 1][j - 1]));
+                }
+                totalSquares += mat[i][j];
+            }
+        }
+        return totalSquares;
+    }
+}
+
+
+//0 - 1 Knapsack Problem
+class Solution {
+    static int knapsack(int W, int val[], int wt[]) {
+        int n = val.length;
+        int[][] dp = new int[n + 1][W + 1];
+
+        // build DP table
+        for (int i = 1; i <= n; i++) {
+            for (int w = 1; w <= W; w++) {
+                if (wt[i - 1] <= w) {
+                    dp[i][w] = Math.max(dp[i - 1][w], val[i - 1] + dp[i - 1][w - wt[i - 1]]);
+                } else {
+                    dp[i][w] = dp[i - 1][w];
+                }
+            }
+        }
+
+        return dp[n][W];
+    }
+}
+
+
+
+//Edit Distance
+class Solution {
+    public int editDistance(String s1, String s2) {
+        int n = s1.length(), m = s2.length();
+        int[][] dp = new int[n+1][m+1];
+
+        for(int i=0;i<=n;i++) dp[i][0]=i;
+        for(int j=0;j<=m;j++) dp[0][j]=j;
+
+        for(int i=1;i<=n;i++){
+            for(int j=1;j<=m;j++){
+                dp[i][j] = s1.charAt(i-1)==s2.charAt(j-1) ? dp[i-1][j-1]
+                : 1 + Math.min(dp[i-1][j-1], Math.min(dp[i-1][j], dp[i][j-1]));
+            }
+        }
+        return dp[n][m];
+    }
+}
+
+
+OR
+
+class Solution {
+    public int editDistance(String s1, String s2) {
+        int n = s1.length();
+        int m = s2.length();
+        int[][] dp = new int[n + 1][m + 1];
+
+        // Step 1: Fill first row and first column
+        for (int i = 0; i <= n; i++) dp[i][0] = i; // remove all letters
+        for (int j = 0; j <= m; j++) dp[0][j] = j; // insert all letters
+
+        // Step 2: Fill rest of the table
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (s1.charAt(i - 1) == s2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1]; // same letters → no change
+                } else {
+                    dp[i][j] = 1 + Math.min(
+                        dp[i - 1][j - 1], // replace
+                        Math.min(dp[i - 1][j], // remove
+                                 dp[i][j - 1]) // insert
+                    );
+                }
+            }
+        }
+        // Step 3: Answer is bottom-right cell
+        return dp[n][m];
+    }
+}
+
+
+
+//Koko Eating Bananas
+class Solution {
+    public int kokoEat(int[] arr, int k) {
+        int maxPile = 0;
+        for (int bananas : arr) {
+            maxPile = Math.max(maxPile, bananas);
+        }
+
+        int low = 1, high = maxPile, ans = maxPile;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            if (canFinish(arr, k, mid)) {
+                ans = mid;         // feasible speed
+                high = mid - 1;    // try smaller
+            } else {
+                low = mid + 1;     // need faster
+            }
+        }
+
+        return ans;
+    }
+
+    private boolean canFinish(int[] arr, int k, int speed) {
+        long hours = 0;
+        for (int bananas : arr) {
+            // ceil(bananas / speed)
+            hours += (bananas + speed - 1) / speed;
+            if (hours > k) return false; // early stop
+        }
+        return hours <= k;
+    }
+}
+
+
+
+//Capacity To Ship Packages Within D Days
+class Solution {
+    static int leastWeightCapacity(int[] arr, int n, int d) {
+        int maxWeight = 0, sumWeight = 0;
+
+        // find max weight and total sum
+        for (int w : arr) {
+            maxWeight = Math.max(maxWeight, w);
+            sumWeight += w;
+        }
+
+        int low = maxWeight, high = sumWeight, ans = high;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            if (canShip(arr, n, d, mid)) {
+                ans = mid;      // feasible, try smaller
+                high = mid - 1;
+            } else {
+                low = mid + 1;  // not feasible, need bigger capacity
+            }
+        }
+
+        return ans;
+    }
+
+    // helper function: check if we can ship within d days
+    static boolean canShip(int[] arr, int n, int d, int capacity) {
+        int days = 1, currentLoad = 0;
+
+        for (int w : arr) {
+            if (currentLoad + w > capacity) {
+                days++;
+                currentLoad = 0;
+            }
+            currentLoad += w;
+            if (days > d) return false;
+        }
+        return true;
+    }
+}

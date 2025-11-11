@@ -1,0 +1,258 @@
+//Kth Smallest
+class Solution {
+    public static int kthSmallest(int[] arr, int k) {
+        // Create a Max-Heap of size k
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+
+        // Process each element
+        for (int num : arr) {
+            maxHeap.add(num);
+
+            // If heap size exceeds k, remove the largest
+            if (maxHeap.size() > k) {
+                maxHeap.poll();
+            }
+        }
+
+        // Root of max-heap is the kth smallest element
+        return maxHeap.peek();
+    }
+}
+
+//Nearly sorted
+class Solution {
+    public void nearlySorted(int[] arr, int k) {
+      int n = arr.length;
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        int index = 0;
+
+        // Add first k+1 elements to heap
+        for (int i = 0; i <= k && i < n; i++) {
+            minHeap.add(arr[i]);
+        }
+
+        // Process remaining elements
+        for (int i = k+1; i < n; i++) {
+            arr[index++] = minHeap.poll(); // smallest element goes to array
+            minHeap.add(arr[i]);
+        }
+
+        // Extract remaining elements from heap
+        while (!minHeap.isEmpty()) {
+            arr[index++] = minHeap.poll();
+        }
+    }
+}
+
+//Minimum Cost of ropes
+class Solution {
+    public static int minCost(int[] arr) {
+       if (arr.length <= 1) return 0;
+
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        for (int rope : arr) {
+            minHeap.add(rope);
+        }
+
+        int totalCost = 0;
+
+        while (minHeap.size() > 1) {
+            int first = minHeap.poll();
+            int second = minHeap.poll();
+
+            int cost = first + second;
+            totalCost += cost;
+
+            minHeap.add(cost); // push new rope back
+        }
+
+        return totalCost;
+    }
+}
+
+//K Closest Points to Origin
+class Solution {
+    public int[][] kClosest(int[][] points, int k) {
+        // Max-Heap based on distance squared
+        PriorityQueue<int[]> maxHeap = new PriorityQueue<>(
+            (a, b) -> Integer.compare(b[0]*b[0] + b[1]*b[1], a[0]*a[0] + a[1]*a[1])
+        );
+
+        for (int[] point : points) {
+            maxHeap.add(point);
+
+            // Keep only k closest points in heap
+            if (maxHeap.size() > k) {
+                maxHeap.poll();
+            }
+        }
+
+        // Extract k closest points from heap
+        int[][] result = new int[k][2];
+        int index = 0;
+        while (!maxHeap.isEmpty()) {
+            result[index++] = maxHeap.poll();
+        }
+
+        return result;
+    }
+}
+
+📘 Notes for Notebook
+Problem:
+
+Given points [x, y] and an integer k, return the k closest points to origin (0, 0).
+
+Distance = Euclidean distance: sqrt(x^2 + y^2)
+
+Can return in any order.
+
+Approach: Max-Heap (PriorityQueue)
+
+Idea:
+
+Maintain a Max-Heap of size k.
+
+For each point:
+
+Compute distance squared (x^2 + y^2) → no need for sqrt, as sqrt is monotonic.
+
+Add to Max-Heap.
+
+If heap size > k → remove the farthest point (largest distance).
+
+After processing all points, heap contains k closest points.
+
+Why Max-Heap:
+
+Keeps k smallest distances efficiently.
+
+Removing the farthest in O(log k) time.
+
+Time Complexity: O(n log k)
+Space Complexity: O(k)
+
+
+//K closest elements
+class Solution {
+    int[] printKClosest(int[] arr, int k, int x) {
+        // Max-heap: farthest element at top
+        PriorityQueue<int[]> maxHeap = new PriorityQueue<>(new Comparator<int[]>() {
+            public int compare(int[] a, int[] b) {
+                int distA = Math.abs(a[0] - x);
+                int distB = Math.abs(b[0] - x);
+                if (distA != distB) return distB - distA;  // larger distance first
+                return a[0] - b[0];  // tie-break: smaller element removed first
+            }
+        });
+
+        for (int num : arr) {
+            if (num == x) continue; // skip x
+            maxHeap.add(new int[]{num});
+            if (maxHeap.size() > k) {
+                maxHeap.poll(); // remove farthest
+            }
+        }
+
+        // Extract elements in order of closeness
+        int[] result = new int[k];
+        for (int i = k - 1; i >= 0; i--) {
+            result[i] = maxHeap.poll()[0];
+        }
+
+        return result;
+    }
+}
+
+//Top K Frequent in Array
+class Solution {
+    public ArrayList<Integer> topKFrequent(int[] arr, int k) {
+        // Step 1: Frequency map
+        HashMap<Integer, Integer> freq = new HashMap<>();
+        for (int num : arr) {
+            freq.put(num, freq.getOrDefault(num, 0) + 1);
+        }
+
+        // Step 2: Create a list of elements
+        List<int[]> list = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : freq.entrySet()) {
+            list.add(new int[]{entry.getKey(), entry.getValue()});
+        }
+
+        // Step 3: Sort by frequency(desc), then value(desc)
+        Collections.sort(list, (a, b) -> {
+            if (b[1] != a[1]) return b[1] - a[1];   // frequency descending
+            return b[0] - a[0];                     // number descending
+        });
+
+        // Step 4: Extract top k
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            result.add(list.get(i)[0]);
+        }
+
+        return result;
+    }
+}
+
+
+//Is Binary Tree Heap
+class Solution {
+    // Count total nodes
+    int countNodes(Node root) {
+        if (root == null) return 0;
+        return 1 + countNodes(root.left) + countNodes(root.right);
+    }
+
+    // Check if tree is complete and heap property holds
+    boolean isHeapUtil(Node root, int index, int n) {
+        if (root == null) return true;
+
+        // If index >= total nodes → Not complete
+        if (index >= n) return false;
+
+        // Check max-heap property
+        if (root.left != null && root.data < root.left.data) return false;
+        if (root.right != null && root.data < root.right.data) return false;
+
+        // Recurse for left and right
+        return isHeapUtil(root.left, 2 * index + 1, n) &&
+               isHeapUtil(root.right, 2 * index + 2, n);
+    }
+
+    boolean isHeap(Node tree) {
+        int n = countNodes(tree);
+        return isHeapUtil(tree, 0, n);
+    }
+}
+
+
+
+//BST to max heap
+class Solution {
+    static int index = 0;
+
+    // Step 1: Store inorder (sorted values)
+    static void inorder(Node root, ArrayList<Integer> arr) {
+        if (root == null) return;
+        inorder(root.left, arr);
+        arr.add(root.data);
+        inorder(root.right, arr);
+    }
+
+    // Step 2: Replace values using postorder
+    static void postorderFill(Node root, ArrayList<Integer> arr) {
+        if (root == null) return;
+        postorderFill(root.left, arr);
+        postorderFill(root.right, arr);
+        root.data = arr.get(index++);
+    }
+
+    public static void convertToMaxHeapUtil(Node root) {
+        ArrayList<Integer> arr = new ArrayList<>();
+        inorder(root, arr);          // Get sorted values
+        index = 0;
+        postorderFill(root, arr);    // Assign values in postorder
+    }
+}

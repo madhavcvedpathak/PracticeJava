@@ -1,0 +1,741 @@
+// Middle of a Linked List
+class Solution {
+    int getMiddle(Node head) {
+        int length = 0;
+        Node temp = head;
+        while(temp != null){
+            temp = temp.next;
+            length++;
+        }
+        temp = head;
+        for(int i = 1; i <= length/2; i++){
+            temp = temp.next;
+        }
+        return temp.data;
+    }
+}
+
+//Slow Fast Approach
+int getMiddle(Node head){
+    Node slow = head;
+    Node fast = head;
+    while(fast != null && fast.next != null){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    return slow.data;
+}
+
+//Kth from End of Linked List
+int getKthFromLast(Node head, int k) {
+    // Your code here
+    Node slow = head;
+    Node fast = head;
+    for(int i = 1; i<=k; i++){
+        if(fast == null) return -1;
+        fast = fast.next;
+    }
+    while(fast!=null){
+        slow = slow.next;
+        fast = fast.next;
+    }
+    return slow.data;
+}
+
+// Function to check if the linked list has a loop.
+public static boolean detectLoop(Node head) {
+    Node slow = head;
+    Node fast = head;
+    while(fast!=null && fast.next!=null){
+        slow = slow.next;
+        fast = fast.next.next;
+        if(fast == slow) return true;
+    }
+    return false;
+}
+
+//Find the first node of loop in linked list
+public static Node findFirstNode(Node head) {
+    if (head == null || head.next == null) return null;
+
+    Node slow = head;
+    Node fast = head;
+    // Step 1: Detect loop using Floyd’s algorithm
+    while (fast != null && fast.next != null) {
+        slow = slow.next;           // move 1 step
+        fast = fast.next.next;      // move 2 steps
+
+        if (slow == fast) {
+            // Step 2: Loop detected, now find the starting node
+            slow = head;
+            while (slow != fast) {
+                slow = slow.next;
+                fast = fast.next;
+            }
+            return slow; // First node of the loop
+        }
+    }
+    return null; // No loop found
+}
+
+//Remove Duplicates from a Sorted Linked List
+Node removeDuplicates(Node head) {
+    Node current = head;
+        // Traverse the list
+    while (current != null && current.next != null) {
+        if (current.data == current.next.data) {
+                    // Duplicate found — skip the next node
+            current.next = current.next.next;
+        } else {
+                    // Move to next distinct element
+            current = current.next;
+        }
+    }
+    return head; // Return the updated head
+}
+
+OR
+
+Node removeDuplicates(Node head) {
+    Node i = head;
+    Node j = head;
+    while(j!=null){
+        if(i.data == j.data) j = j.next;
+            else{
+                i.next = j;
+                i = j;
+            }
+        }
+        i.next = j;
+        return head;
+    }
+}
+
+//Rotate a Linked List
+public Node rotate(Node head, int k) {
+    if (head == null || head.next == null || k == 0)
+        return head;
+    // Step 1: Compute the length of the linked list
+    Node current = head;
+    int length = 1;
+    while (current.next != null) {
+        current = current.next;
+        length++;
+    }
+    // Step 2: Make the list circular
+    current.next = head;
+    // Step 3: Find the effective rotation
+    k = k % length;
+    if (k == 0) {
+        current.next = null; // break the circular link
+        return head;
+    }
+    // Step 4: Traverse to the (k-th) node from head
+    Node newTail = head;
+    for (int i = 1; i < k; i++) {
+        newTail = newTail.next;
+    }
+    // Step 5: Set new head and break the link
+    Node newHead = newTail.next;
+    newTail.next = null;
+
+    return newHead;
+}
+
+//Merge two sorted linked lists
+Node sortedMerge(Node head1, Node head2) {
+        Node i = head1;
+        Node j = head2;
+        Node dummy = new Node(-1);
+        Node k = dummy;
+        while(i!=null && j!=null){
+            if(i.data <= j.data){
+                k.next = i;
+                i = i.next;
+            }
+            else{
+                k.next = j;
+                j = j.next;
+            }
+            k = k.next;
+        }
+        if(i == null) k.next = j;
+        else k.next = i;
+        return dummy.next;
+    }
+
+//Merge Sort for Linked List
+static Node mergeSort(Node head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        // Find the middle of the list
+        Node slow = head;
+        Node fast = head;
+        while (fast.next != null && fast.next.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        // Split the list into two halves
+        Node head2 = slow.next;
+        slow.next = null;
+        // Sort each half
+        head = mergeSort(head);
+        head2 = mergeSort(head2);
+        // Merge the two sorted halves
+        return merge(head, head2);
+    }
+    static Node merge(Node head1, Node head2) {
+        Node dummy = new Node(-1);
+        Node tail = dummy;
+        while (head1 != null && head2 != null) {
+            if (head1.data <= head2.data) {
+                tail.next = head1;
+                head1 = head1.next;
+            } else {
+                tail.next = head2;
+                head2 = head2.next;
+            }
+            tail = tail.next;
+        }
+        // Attach remaining nodes
+        if (head1 != null) tail.next = head1;
+        if (head2 != null) tail.next = head2;
+        return dummy.next;
+    }
+
+//Partition a Linked List around a given value
+class Solution {
+    public static Node partition(Node head, int x) {
+        Node lessHead = new Node(0);     // dummy head for less than x
+        Node equalHead = new Node(0);    // dummy head for equal to x
+        Node greaterHead = new Node(0);  // dummy head for greater than x
+
+        Node less = lessHead, equal = equalHead, greater = greaterHead;
+
+        while (head != null) {
+            if (head.data < x) {
+                less.next = head;
+                less = less.next;
+            } else if (head.data == x) {
+                equal.next = head;
+                equal = equal.next;
+            } else {
+                greater.next = head;
+                greater = greater.next;
+            }
+            head = head.next;
+        }
+        // Terminate the greater list
+        greater.next = null;
+        // Connect equal to greater
+        equal.next = greaterHead.next;
+        // Connect less to equal (or directly to greater if no equal values)
+        less.next = equalHead.next;
+        return lessHead.next;
+    }
+}
+
+//Odd Even Linked List
+public ListNode oddEvenList(ListNode head) {
+    if (head == null || head.next == null) return head;
+    ListNode odd = head;
+    ListNode even = head.next;
+    ListNode evenHead = even;
+    while (even != null && even.next != null) {
+        odd.next = even.next; // link odd to next odd
+        odd = odd.next;
+        even.next = odd.next; // link even to next even
+        even = even.next;
+    }
+    odd.next = evenHead; // combine odd and even lists
+    return head;
+}
+
+//Partition List
+public ListNode partition(ListNode head, int x) {
+    ListNode d1 = new ListNode(-1); // dummy head for < x
+    ListNode d2 = new ListNode(-1); // dummy head for >= x
+    ListNode t1 = d1;
+    ListNode t2 = d2;
+    ListNode t = head;
+    while (t != null) {
+        if (t.val < x) {
+            t1.next = t;
+            t1 = t1.next;
+        } else {
+            t2.next = t;
+            t2 = t2.next;
+        }
+        t = t.next;
+    }
+    // Finalize the two lists
+    t2.next = null;        // Important: avoid cycle
+    t1.next = d2.next;     // Connect both partitions
+    return d1.next;
+}
+
+
+//Palindrome Linked List
+static boolean isPalindrome(Node head) {
+    Node temp = head;
+    ArrayList<Integer> arr = new ArrayList<>();
+    while(temp != null){
+        arr.add(temp.data);
+        temp = temp.next;
+    }
+    int n = arr.size();
+    int i = 0, j = n -1;
+    while(i < j){
+        if(!arr.get(i).equals(arr.get(j))) return false;
+        i++;
+        j--;
+    }
+    return true;
+}
+
+
+//Segregate even and odd nodes in a Linked List
+Node divide(Node head) {
+    if (head == null || head.next == null) return head;
+    Node evenStart = null, evenEnd = null;
+    Node oddStart = null, oddEnd = null;
+    Node current = head;
+    while (current != null) {
+        int val = current.data;
+        if (val % 2 == 0) { // even
+            if (evenStart == null) {
+                evenStart = current;
+                evenEnd = evenStart;
+            } else {
+                evenEnd.next = current;
+                evenEnd = evenEnd.next;
+            }
+        } else { // odd
+            if (oddStart == null) {
+                oddStart = current;
+                oddEnd = oddStart;
+            } else {
+                oddEnd.next = current;
+                oddEnd = oddEnd.next;
+            }
+        }
+        current = current.next;
+    }
+    // If no even nodes, return odd list
+    if (evenStart == null) return oddStart;
+    // If no odd nodes, even list is the result
+    if (oddStart == null) {
+        evenEnd.next = null;
+        return evenStart;
+    }
+    // Combine even and odd lists
+    evenEnd.next = oddStart;
+    oddEnd.next = null;
+    return evenStart;
+}
+
+//Reverse a linked list
+Node reverseList(Node head) {
+  //  Node temp = head;
+    //ArrayList<Node> arr = new ArrayList<>();
+    //while(temp != null){
+      //  arr.add(temp);
+        //temp = temp.next;
+    //}
+    //int n = arr.size();
+    //for(int i = n - 1; i>=1; i--){
+    //    arr.get(i).next = arr.get(i-1);
+    //}
+    //arr.get(0).next = null;
+    //return arr.get(n-1);
+//}
+
+    //Node curr = head;
+    //Node prev = null;
+    //Node fwd = null;
+    //while(curr != null){
+        //fwd = curr.next;
+        //curr.next = prev;
+        //prev = curr;
+        //curr = fwd;
+    //}
+    //return prev;
+
+
+    if(head == null || head.next == null) return head;
+    Node a = head.next;
+    head.next = null;
+    Node b = reverseList(a);
+    a.next = head;
+    return b;
+}
+
+//Swap Nodes in Pairs
+public ListNode swapPairs(ListNode head) {
+    // Base case: if 0 or 1 node, just return it (nothing to swap)
+    if (head == null || head.next == null) {
+        return head;
+    }
+
+    // Nodes to swap
+    ListNode first = head;
+    ListNode second = head.next;
+
+    // Swap
+    first.next = swapPairs(second.next); // Recursively swap the rest
+    second.next = first; // Second becomes new head
+
+    return second; // Return new head
+}
+
+//Reorder List
+void reorderlist(Node head) {
+    if (head == null || head.next == null) return;
+
+    // Step 1: Find the middle
+    Node slow = head, fast = head;
+    while (fast != null && fast.next != null && fast.next.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    // Step 2: Reverse second half
+    Node second = reverse(slow.next);
+    slow.next = null; // Cut the first half
+
+    // Step 3: Merge both halves
+    Node first = head;
+    while (second != null) {
+        Node temp1 = first.next;
+        Node temp2 = second.next;
+
+        first.next = second;
+        second.next = temp1;
+
+        first = temp1;
+        second = temp2;
+    }
+}
+
+Node reverse(Node head) {
+    Node prev = null;
+    Node curr = head;
+
+    while (curr != null) {
+        Node next = curr.next;
+        curr.next = prev;
+        prev = curr;
+        curr = next;
+    }
+
+    return prev;
+}
+
+//Merge K sorted linked lists
+Node mergeKLists(List<Node> arr) {
+     if (arr == null || arr.size() == 0) return null;
+
+    // Start with the first list
+    Node result = arr.get(0);
+
+    // Merge one by one
+    for (int i = 1; i < arr.size(); i++) {
+        result = mergeTwoLists(result, arr.get(i));
+    }
+
+    return result;
+}
+
+// Helper function to merge two lists
+Node mergeTwoLists(Node l1, Node l2) {
+    Node dummy = new Node(0);
+    Node tail = dummy;
+
+    while (l1 != null && l2 != null) {
+        if (l1.data < l2.data) {
+            tail.next = l1;
+            l1 = l1.next;
+        } else {
+            tail.next = l2;
+            l2 = l2.next;
+        }
+        tail = tail.next;
+    }
+
+    if (l1 != null) tail.next = l1;
+    else tail.next = l2;
+
+    return dummy.next;
+}
+
+//Reverse a sublist of a linked list
+public static Node reverseBetween(int a, int b, Node head) {
+    ArrayList<Node> arr = new ArrayList<>();
+    Node temp = head;
+
+    // Store nodes in list
+    while (temp != null) {
+        arr.add(temp);
+        temp = temp.next;
+    }
+
+    // Reverse between a-1 and b-1 (0-based index)
+    int i = a - 1, j = b - 1;
+    while (i < j) {
+        Node t = arr.get(i);
+        arr.set(i, arr.get(j));
+        arr.set(j, t);
+        i++;
+        j--;
+    }
+
+    // Reconnect nodes
+    for (int k = 0; k < arr.size() - 1; k++) {
+        arr.get(k).next = arr.get(k + 1);
+    }
+    arr.get(arr.size() - 1).next = null; // last node points to null
+    return arr.get(0); // new head
+}
+
+//Circular Linked List Traversal
+void printList(Node head) {
+    if (head == null) {
+        return; // empty list
+    }
+    Node temp = head;
+    do {
+        System.out.print(temp.data + " ");
+        temp = temp.next;
+    } while (temp != head); // loop until we return to the head
+}
+
+//Deletion and Reverse in Circular Linked List
+class Solution {
+    Node deleteNode(Node head, int key) {
+        if (head == null) return null;
+
+        Node curr = head;
+
+        // Delete head node case
+        if (head.data == key) {
+            if (head.next == head) return null; // only one node
+            while (curr.next != head) curr = curr.next;
+            curr.next = head.next;
+            head = head.next;
+            return head;
+        }
+        // Delete non-head node
+        while (curr.next != head) {
+            if (curr.next.data == key) {
+                curr.next = curr.next.next;
+                break;
+            }
+            curr = curr.next;
+        }
+        return head;
+    }
+
+    Node reverse(Node head) {
+        if (head == null || head.next == head) return head;
+
+        Node prev = null, curr = head, next;
+        do {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        } while (curr != head);
+
+        head.next = prev; // fix circular link
+        return prev;      // new head
+    }
+}
+
+//Reverse a Doubly Linked List
+public DLLNode reverseDLL(DLLNode head) {
+    if (head == null) return null;
+    DLLNode current = head;
+    DLLNode temp = null;
+
+    // Traverse and swap next and prev for each node
+    while (current != null) {
+        // Swap
+        temp = current.prev;
+        current.prev = current.next;
+        current.next = temp;
+
+        // Move to next node in original list (which is prev now)
+        current = current.prev;
+    }
+
+    // After the loop, temp is at the old head's previous node
+    // So, temp.prev is the new head
+    if (temp != null) {
+        head = temp.prev;
+    }
+    return head;
+}
+
+OR
+
+public DLLNode reverseDLL(DLLNode head) {
+    DLLNode curr = head, temp = null;
+    while (curr != null) {
+        temp = curr.prev;
+        curr.prev = curr.next;
+        curr.next = temp;
+        curr = curr.prev;
+    }
+    return (temp != null) ? temp.prev : null;
+}
+
+OR
+
+public DLLNode reverseDLL(DLLNode head) {
+    if (head == null || head.next == null) return head;
+
+    DLLNode current = head;
+    DLLNode newHead = null;
+
+    while (current != null) {
+        // Swap next and prev
+        DLLNode temp = current.next;
+        current.next = current.prev;
+        current.prev = temp;
+
+        // Move forward
+        newHead = current; // this keeps track of the last node visited
+        current = temp;  // move to next node (originally current.next)
+    }
+
+    return newHead;
+}
+
+
+//Rotate doubly Linked List
+public Node rotateDLL(Node head, int p) {
+    Node tail = head;
+
+    // Find the last node
+    while (tail.next != null) {
+        tail = tail.next;
+    }
+    // Make the list circular
+    tail.next = head;
+    head.prev = tail;
+
+    // Move head and tail by the given position
+    for (int count = 1; count <= p; count++) {
+        head = head.next;
+        tail = tail.next;
+    }
+    // Break the circular connection
+    tail.next = null;
+    head.prev = null;
+
+    return head;
+}
+
+
+//Remove duplicates from a sorted doubly linked list
+Node removeDuplicates(Node head) {
+    if (head == null || head.next == null) return head;
+
+    Node current = head;
+
+    while (current != null && current.next != null) {
+        if (current.data == current.next.data) {
+            // Duplicate found — remove next node
+            Node duplicate = current.next;
+            current.next = duplicate.next;
+
+            if (duplicate.next != null) {
+                duplicate.next.prev = current;
+            }
+            // No need to move current forward — check again
+        } else {
+            current = current.next;  // No duplicate — move forward
+        }
+    }
+    return head;
+}
+
+
+//Find the Minimum and Maximum Number of Nodes Between Critical Points.
+public int[] nodesBetweenCriticalPoints(ListNode head) {
+    int index = 1;
+    int first = -1;
+    int last = -1;
+    int prevCritical = -1;
+    int min = Integer.MAX_VALUE;
+
+    ListNode a = head;
+    ListNode b = head.next;
+    ListNode c = b.next;
+
+    while (c != null) {
+        // Check if b is a critical point
+        if ((b.val > a.val && b.val > c.val) || (b.val < a.val && b.val < c.val)) {
+            if (first == -1) {
+                first = index;
+            } else {
+                min = Math.min(min, index - prevCritical);
+                last = index;
+            }
+            prevCritical = index;
+        }
+
+        // Move to next 3 nodes
+        a = b;
+        b = c;
+        c = c.next;
+        index++;
+    }
+
+    // If less than 2 critical points
+    if (first == -1 || last == -1) {
+        return new int[]{-1, -1};
+    }
+    return new int[]{min, last - first};
+}
+
+
+//Copy List with Random Pointer
+public Node copyRandomList(Node head) {
+    if (head == null) return null;
+
+    // Step 1: Clone nodes and insert them after original nodes
+    Node curr = head;
+    while (curr != null) {
+        Node copy = new Node(curr.val);
+        copy.next = curr.next;
+        curr.next = copy;
+        curr = copy.next;
+    }
+
+    // Step 2: Set random pointers for the copied nodes
+    curr = head;
+    while (curr != null) {
+        if (curr.random != null) {
+            curr.next.random = curr.random.next;
+        }
+        curr = curr.next.next;
+    }
+
+    // Step 3: Separate the original and copied list
+    curr = head;
+    Node copiedHead = head.next;
+    Node copyCurr = copiedHead;
+
+    while (curr != null) {
+        curr.next = curr.next.next;
+        if (copyCurr.next != null) {
+            copyCurr.next = copyCurr.next.next;
+        }
+        curr = curr.next;
+        copyCurr = copyCurr.next;
+    }
+
+    return copiedHead;
+}

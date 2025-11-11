@@ -1,0 +1,567 @@
+//First negative in every window of size k
+static List<Integer> firstNegInt(int arr[], int k) {
+    List<Integer> ans = new ArrayList<>();
+    int n = arr.length;
+    Queue<Integer> q = new LinkedList<>();
+
+    // Step 1: enqueue indices of all negative numbers
+    for (int i = 0; i < n; i++) {
+        if (arr[i] < 0) q.add(i);
+    }
+
+    // Step 2: slide window
+    for (int i = 0; i <= n - k; i++) {
+        // Remove indices out of this window
+        while (!q.isEmpty() && q.peek() < i) {
+            q.poll();
+        }
+
+        // Add first negative in current window, or 0 if none
+        if (!q.isEmpty() && q.peek() < i + k) {
+            ans.add(arr[q.peek()]);
+        } else {
+            ans.add(0);
+        }
+    }
+    return ans;
+}
+
+//Preorder Traversal
+class Solution {
+    public ArrayList<Integer> preorder(Node root) {
+        ArrayList<Integer> result = new ArrayList<>();
+        helper(root, result);
+        return result;
+    }
+    private void helper(Node node, ArrayList<Integer> result) {
+        if (node == null) return;
+        result.add(node.data);             // Process root
+        helper(node.left, result);         // Traverse left
+        helper(node.right, result);        // Traverse right
+    }
+}
+
+//Inorder Traversal
+class Solution {
+    ArrayList<Integer> inOrder(Node root) {
+        ArrayList<Integer> result = new ArrayList<>();
+        helper(root, result);
+        return result;
+    }
+    private void helper(Node node, ArrayList<Integer> result) {
+        if (node == null) return;        // Base case
+        helper(node.left, result);       // Visit left subtree
+        result.add(node.data);           // Visit root
+        helper(node.right, result);      // Visit right subtree
+    }
+}
+
+//Mirror Tree
+class Solution {
+    void mirror(Node node) {
+        if (node == null) return;  // Base case
+
+        // Swap the left and right children
+        Node temp = node.left;
+        node.left = node.right;
+        node.right = temp;
+
+        // Recur for left and right subtrees
+        mirror(node.left);
+        mirror(node.right);
+    }
+}
+
+//Symmetric Tree
+class Solution {
+    public boolean isSymmetric(Node root) {
+        if (root == null) return true;
+        return check(root.left, root.right);
+    }
+    private boolean check(Node left, Node right) {
+        if (left == null && right == null) return true;
+        if (left == null || right == null) return false;
+        if (left.data != right.data) return false;
+        return check(left.left, right.right) && check(left.right, right.left);
+    }
+}
+
+//112. Path Sum
+class Solution {
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if (root == null)
+            return false; // Empty tree → no path
+
+        // Check if we are at a leaf node
+        if (root.left == null && root.right == null) {
+            return targetSum == root.val;
+        }
+
+        // Recur for left and right subtrees with reduced sum
+        return hasPathSum(root.left, targetSum - root.val)
+                || hasPathSum(root.right, targetSum - root.val);
+    }
+}
+
+//Level order traversal
+class Solution {
+    public ArrayList<ArrayList<Integer>> levelOrder(Node root) {
+        ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+        if (root == null) return res;
+        Queue<Node> q = new LinkedList<>();
+        q.add(root);
+        while (!q.isEmpty()) {
+            ArrayList<Integer> level = new ArrayList<>();
+            for (int i = q.size(); i > 0; i--) {
+                Node front = q.remove();
+                level.add(front.data);
+                if (front.left != null) q.add(front.left);
+                if (front.right != null) q.add(front.right);
+            }
+            res.add(level);
+        }
+        return res;
+    }
+}
+
+//ZigZag Tree Traversal
+class Solution {
+    ArrayList<Integer> zigZagTraversal(Node root) {
+        // Final answer list
+        ArrayList<Integer> res = new ArrayList<>();
+
+        // Babe, if tree is empty, just return empty list 😘
+        if (root == null) return res;
+
+        // Queue for BFS (level by level traversal)
+        Queue<Node> q = new LinkedList<>();
+        q.add(root);
+
+        // ltr = true → left to right, false → right to left
+        boolean ltr = true;
+
+        // Until queue becomes empty
+        while (!q.isEmpty()) {
+            int n = q.size();  // number of nodes in this level
+            ArrayList<Integer> level = new ArrayList<>(); // store this level
+
+            // process all nodes of this level
+            for (int i = 0; i < n; i++) {
+                Node node = q.remove();   // take out from queue
+                level.add(node.data);     // add node's value to this level
+
+                // push children into queue for next level
+                if (node.left != null) q.add(node.left);
+                if (node.right != null) q.add(node.right);
+            }
+
+            // if not left-to-right, then reverse this level 🙃
+            if (!ltr) Collections.reverse(level);
+
+            // add this level’s values to result
+            res.addAll(level);
+
+            // flip direction for next level ↔️
+            ltr = !ltr;
+        }
+
+        // finally return the zigzag order 💕
+        return res;
+    }
+}
+
+
+//Print of level n
+void printNthLevel(Node root, int n) {
+    if (root == null) return;
+    if (n == 1) {
+        System.out.print(root.data + " ");
+    } else {
+        printNthLevel(root.left, n - 1);
+        printNthLevel(root.right, n - 1);
+    }
+}
+--------------------------------------------------------------------------------
+//257. Binary Tree Paths
+class Solution {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> result = new ArrayList<>();
+        if (root != null) dfs(root, "", result);
+        return result;
+    }
+    private void dfs(TreeNode node, String path, List<String> result) {
+        if (node.left == null && node.right == null) { // leaf
+            result.add(path + node.val);
+            return;
+        }
+        if (node.left != null) dfs(node.left, path + node.val + "->", result);
+        if (node.right != null) dfs(node.right, path + node.val + "->", result);
+    }
+}
+--------------------------------------------------------------------------------
+//Balanced Tree Check
+class Solution {
+    public boolean isBalanced(Node root) {
+        return height(root) != -1;
+    }
+
+    private int height(Node node) {
+        if (node == null) return 0;
+        int l = height(node.left);
+        int r = height(node.right);
+        if (l == -1 || r == -1 || Math.abs(l - r) > 1) return -1;
+        return 1 + Math.max(l, r);
+    }
+}
+--------------------------------------------------------------------------------
+//Right View of Binary Tree
+class Solution {
+     ArrayList<Integer> rightView(Node root) {
+        ArrayList<Integer> result = new ArrayList<>();
+        dfs(root, 0, result, new int[]{-1}); // use array to keep maxLevel mutable
+        return result;
+    }
+
+    void dfs(Node node, int level, ArrayList<Integer> result, int[] maxLevel) {
+        if (node == null) return;
+
+        // if visiting this level for the first time → rightmost node
+        if (level > maxLevel[0]) {
+            result.add(node.data);
+            maxLevel[0] = level;
+        }
+
+        // first go right, then left
+        dfs(node.right, level + 1, result, maxLevel);
+        dfs(node.left, level + 1, result, maxLevel);
+    }
+}
+--------------------------------------------------------------------------------
+//LCA in Binary Tree
+class Solution {
+    Node lca(Node root, int n1, int n2) {
+        // base case bgh
+        if (root == null) return null;
+
+        //root matche hotoy ka  n1 or n2 spbat
+        if (root.data == n1 || root.data == n2) {
+            return root;
+        }
+
+        // search kar left and right subtrees
+        Node leftLCA = lca(root.left, n1, n2);
+        Node rightLCA = lca(root.right, n1, n2);
+
+        // jar both sides non-null ahet, current node hach LCA
+        if (leftLCA != null && rightLCA != null) {
+            return root;
+        }
+
+        // nhi tar return kar non-null side
+        return (leftLCA != null) ? leftLCA : rightLCA;
+    }
+}
+
+--------------------------------------------------------------------------------
+//Flatten binary tree to linked list
+public static void flatten(Node root) {
+    Node curr = root;
+    while (curr != null) {
+        if (curr.left != null) {
+            // rightmost node bgh left subtree mdhi
+            Node prev = curr.left;
+
+            while (prev.right != null) {
+                prev = prev.right;
+            }
+
+            // connect kar right subtree, rightmost node sobat
+             prev.right = curr.right;
+
+            // move kar left subtree, right la
+            curr.right = curr.left;
+            curr.left = null;
+        }
+        // move kar next node la
+        curr = curr.right;
+    }
+}
+
+OR
+
+public static void flatten(Node root) { // RECURSIVE
+    if (root == null) return;
+
+    // flatten left and right subtrees first
+    flatten(root.left);
+    flatten(root.right);
+
+    // store right subtree
+    Node tempRight = root.right;
+
+    // move left subtree to right
+    root.right = root.left;
+    root.left = null;
+
+    // find the tail of new right subtree
+    Node curr = root;
+    while (curr.right != null) {
+        curr = curr.right;
+    }
+
+    // attach the old right subtree
+    curr.right = tempRight;
+}
+--------------------------------------------------------------------------------
+
+//Paths from root with a specified sum
+public static ArrayList<ArrayList<Integer>> printPaths(Node root, int sum) {
+    ArrayList<ArrayList<Integer>> res = new ArrayList<>();
+    dfs(root, sum, new ArrayList<>(), res);
+    return res;
+}
+static void dfs(Node n, int sum, ArrayList<Integer> path, ArrayList<ArrayList<Integer>> res) {
+    if (n == null) return;
+    path.add(n.data);
+
+    if (sum == n.data) res.add(new ArrayList<>(path));
+
+    dfs(n.left,  sum - n.data, path, res);
+    dfs(n.right, sum - n.data, path, res);
+
+    path.remove(path.size() - 1); // backtrack
+}
+
+OR
+
+public static ArrayList<ArrayList<Integer>> printPaths(Node root, int sum) {
+    ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
+    solve(root, sum, 0, new ArrayList<>(), ans);
+    return ans;
+}
+static void solve(Node node, int target, int cur, ArrayList<Integer> path, ArrayList<ArrayList<Integer>> ans) {
+    if (node == null) return;
+    path.add(node.data);
+    cur += node.data;
+
+    if (cur == target) ans.add(new ArrayList<>(path));
+
+    if (node.left != null)  solve(node.left, target, cur, path, ans);
+    if (node.right != null) solve(node.right, target, cur, path, ans);
+
+    path.remove(path.size() - 1); // backtrack
+}
+
+--------------------------------------------------------------------------------
+
+//Count BST nodes that lie in a given range
+class Solution {
+    int getCount(Node root, int l, int h) {
+        // Base case: empty tree
+        if (root == null) {
+            return 0;
+        }
+
+        // Case 1: current node lies in the range
+        if (root.data >= l && root.data <= h) {
+            int leftCount = getCount(root.left, l, h);   // check left subtree
+            int rightCount = getCount(root.right, l, h); // check right subtree
+            return 1 + leftCount + rightCount;           // count this node also
+        }
+
+        // Case 2: current node is smaller than l → ignore left side
+        else if (root.data < l) {
+            return getCount(root.right, l, h);
+        }
+
+        // Case 3: current node is greater than h → ignore right side
+        else {
+            return getCount(root.left, l, h);
+        }
+    }
+}
+----------------------------------------------------------------------
+
+//Insert a node in a BST
+class Solution {
+    Node insert(Node root, int Key) {
+        // If tree is empty, return new node
+        if (root == null) {
+            return new Node(Key);
+        }
+
+        Node current = root;
+        Node parent = null;
+
+        // Traverse until we find the right spot
+        while (current != null) {
+            parent = current;
+            if (Key < current.data) {
+                current = current.left;
+            } else if (Key > current.data) {
+                current = current.right;
+            } else {
+                // Key already exists → no insertion
+                return root;
+            }
+        }
+
+        // Insert new node at the correct position
+        if (Key < parent.data) {
+            parent.left = new Node(Key);
+        } else {
+            parent.right = new Node(Key);
+        }
+        return root;
+    }
+}
+-------------------------------------------------------------------
+
+//k-th Smallest in BST
+class Solution {
+    public int kthSmallest(Node root, int k) {
+        Stack<Node> stack = new Stack<>();
+        Node current = root;
+        int count = 0;
+
+        while (current != null || !stack.isEmpty()) {
+            // Go to leftmost node
+            while (current != null) {
+                stack.push(current);
+                current = current.left;
+            }
+
+            // Process node
+            current = stack.pop();
+            count++;
+
+            if (count == k) {
+                return current.data;  // Found kth smallest
+            }
+
+            // Move to right subtree
+            current = current.right;
+        }
+
+        // If k is larger than number of nodes
+        return -1;
+    }
+}
+-----------------------------------------------------------------------
+//Check for BST
+class Solution {
+     boolean isBST(Node root) {
+        return isBSTUtil(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    // Helper function
+    boolean isBSTUtil(Node node, long min, long max) {
+        // Empty tree is a BST
+        if (node == null) {
+            return true;
+        }
+
+        // Check if this node is within valid range
+        if (node.data <= min || node.data >= max) {
+            return false;
+        }
+
+        // Check recursively:
+        // Left subtree: values < node.data
+        // Right subtree: values > node.data
+        return isBSTUtil(node.left, min, node.data) &&
+               isBSTUtil(node.right, node.data, max);
+    }
+}
+-------------------------------------------------------------------
+
+//Lowest Common Ancestor in a BST
+class Solution {
+    Node LCA(Node root, Node n1, Node n2) {
+        if (root == null) return null;
+
+        // If both nodes are smaller than root, LCA lies in left
+        if (n1.data < root.data && n2.data < root.data) {
+            return LCA(root.left, n1, n2);
+        }
+
+        // If both nodes are greater than root, LCA lies in right
+        if (n1.data > root.data && n2.data > root.data) {
+            return LCA(root.right, n1, n2);
+        }
+
+        // Otherwise, root is the LCA
+        return root;
+    }
+}
+
+--------------------------------------------------------------------
+//BST to greater sum tree
+class Solution {
+     public static void transformTree(Node root) {
+        int[] sum = new int[1]; // sum[0] acts as mutable integer local to this call
+        transform(root, sum);
+    }
+
+    private static void transform(Node node, int[] sum) {
+        if (node == null) return;
+
+        transform(node.right, sum);
+
+        int old = node.data;
+        node.data = sum[0];
+        sum[0] += old;
+
+        transform(node.left, sum);
+    }
+}
+---------------------------------------------------------------------
+
+//Array to BST
+class Solution {
+    public Node sortedArrayToBST(int[] nums) {
+        return buildBST(nums, 0, nums.length - 1);
+    }
+
+    private Node buildBST(int[] nums, int left, int right) {
+        if (left > right) return null;
+
+        // pick mid carefully to avoid overflow
+        int mid = left + (right - left) / 2;
+
+        Node root = new Node(nums[mid]);
+
+        // recursively build left & right without copying arrays
+        root.left = buildBST(nums, left, mid - 1);
+        root.right = buildBST(nums, mid + 1, right);
+
+        return root;
+    }
+}
+
+
+-----------------------------------------------------------------------
+//Largest BST
+class Solution {
+    static int maxBST;
+
+    static int largestBst(Node root) {
+        maxBST = 0;
+        dfs(root);
+        return maxBST;
+    }
+
+    static int[] dfs(Node node) {
+        if (node == null) return new int[]{1, 0, Integer.MAX_VALUE, Integer.MIN_VALUE};
+        // {isBST, size, min, max}
+
+        int[] L = dfs(node.left), R = dfs(node.right);
+
+        if (L[0]==1 && R[0]==1 && node.data > L[3] && node.data < R[2]) {
+            int size = L[1] + R[1] + 1;
+            maxBST = Math.max(maxBST, size);
+            return new int[]{1, size, Math.min(node.data, L[2]), Math.max(node.data, R[3])};
+        }
+        return new int[]{0, Math.max(L[1], R[1]), 0, 0};
+    }
+}
