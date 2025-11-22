@@ -26,3 +26,4 @@ public class MaximumProductOfSubArray {
         System.out.println("Maximum Sub array product is " + maxSubarrayProduct(arr));
     }
 }
+// Maximum Sub array product is 112000

@@ -8,8 +8,9 @@ public class CountDistinctElementInAnArray {
         Arrays.fill(visited, false);
         int count_dis=0;
         for (int i = 0; i < n; i++) {
-            if (visited[i] == true) // Skip this element if already processed
-                continue;
+            if (visited[i] == true)
+                continue;      // Skip this element if already processed
+
             for (int j = i + 1; j < n; j++) {
                 if (arr[i] == arr[j]) {
                     visited[j] = true;

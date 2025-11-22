@@ -8,6 +8,7 @@ public class EquilibriumIndexOfAnArray {
 
         for (int i = 0; i < n; ++i)
             sum += arr[i];
+
         for (int i = 0; i < n; ++i) {
             sum -= arr[i];
 

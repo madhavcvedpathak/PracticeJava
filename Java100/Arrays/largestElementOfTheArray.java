@@ -9,7 +9,7 @@ public class largestElementOfTheArray {
         {
             if(max < arr[i])
             {
-                max = arr[i];
+                max = arr[i]; //if 'curr' is greater than 'max' then max is that num.
             }
         }
         System.out.print(max);
