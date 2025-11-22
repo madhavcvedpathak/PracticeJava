@@ -15,7 +15,6 @@ public class ArrayIsSubsetOfAnotherArray {
         }
         return true;
     }
-
     public static void main(String args[])
     {
         int arr1[] = { 11, 10, 13, 21, 30, 70 };
