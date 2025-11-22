@@ -37,7 +37,7 @@ public class printOrder {
         int n = arr.length;
         printOrder(arr, n);
     }
-
+//1 2 3 4 40 30 20 10.
 
 
 //    static void printOrder(int[] arr, int n) {
